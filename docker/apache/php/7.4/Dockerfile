@@ -76,7 +76,6 @@ RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 RUN mkdir -p /usr/local/etc/php/extra/ \
     && curl "http://browscap.org/stream?q=Full_PHP_BrowsCapINI" -o /usr/local/etc/php/extra/full_php_browscap.ini \
     && mv /usr/local/etc/php/extra/full_php_browscap.ini /usr/local/etc/php/extra/browscap.ini
-#RUN sed -i -e "s_;browscap_browscap = /usr/local/etc/php/extra/browscap.ini_" /usr/local/etc/php/php.ini
 
 # Add correct rights for www folder.
 RUN chmod -R 777 /var/www \
@@ -84,12 +83,24 @@ RUN chmod -R 777 /var/www \
     && usermod -u 1000 www-data \
     && chsh -s /bin/bash www-data
 RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/vhost.conf
+RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/abcis.sf5.conf
+
 
 RUN a2enmod rewrite
 RUN a2enmod headers
 RUN a2ensite vhost.conf
+RUN a2ensite abcis.sf5.conf
 
 RUN ln -sf /dev/stdout /var/log/apache2/access.log \
     && ln -sf /dev/stderr /var/log/apache2/error.log2
 
-RUN sed -i -e "s/^ *memory_limit.*/memory_limit = 512MB/g" -e "s/^ *max_execution_time.*/max_execution_time = 0/g" /usr/local/etc/php/php.ini
+RUN sed -i -e "s/^ *memory_limit.*/memory_limit = -1/g" -e "s/^ *max_execution_time.*/max_execution_time = 0/g" /usr/local/etc/php/php.ini
+
+# YARN -----------------------------------------------------------------------------------------------------------------
+# Install Yarn
+RUN wget -q https://nodejs.org/dist/v12.15.0/node-v12.15.0-linux-x64.tar.xz && \
+  tar -C /usr/local --strip-components 1 -xJf node-v12.15.0-linux-x64.tar.xz && \
+  curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.22.4 && \
+  ln -sf $HOME/.yarn/bin/yarn /usr/local/bin/yarn && \
+  ln -sf $HOME/.yarn/bin/yarnpkg /usr/local/bin/yarnpkg
+# end YARN -------------------------------------------------------------------------------------------------------------
