@@ -31,7 +31,7 @@ RUN apt-get -y update && \
     openssl && \
     rm -rf /var/lib/apt/lists/* 
 
-# Install gd PHP7 Extension #
+# Install xsl PHP7 Extension #
 RUN apt-get update && apt-get install -y \
 		libxslt-dev \
 	&& docker-php-ext-install xsl
