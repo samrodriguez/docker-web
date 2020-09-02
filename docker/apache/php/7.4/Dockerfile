@@ -26,6 +26,7 @@ RUN apt-get -y update && \
     apt-get -y --no-install-recommends install --fix-missing libcurl4 \
     libcurl4-openssl-dev \
     zip \
+    unzip \
     vim \
     libxml2-dev \
     openssl && \
@@ -64,6 +65,7 @@ RUN docker-php-ext-install pdo_mysql && \
     docker-php-ext-install gettext && \
     docker-php-ext-install xml && \
     docker-php-ext-install exif
+
 
 # Install and enable xdebug.
 RUN pecl install xdebug && docker-php-ext-enable xdebug
