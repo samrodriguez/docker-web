@@ -85,13 +85,14 @@ RUN chmod -R 777 /var/www \
     && usermod -u 1000 www-data \
     && chsh -s /bin/bash www-data
 RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/vhost.conf
+RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/abcis.sf3.conf
 RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/abcis.sf5.conf
-
 
 RUN a2enmod rewrite
 RUN a2enmod headers
 RUN a2ensite vhost.conf
 RUN a2ensite abcis.sf5.conf
+RUN a2ensite abcis.sf3.conf
 
 RUN ln -sf /dev/stdout /var/log/apache2/access.log \
     && ln -sf /dev/stderr /var/log/apache2/error.log2

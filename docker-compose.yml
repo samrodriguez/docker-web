@@ -17,7 +17,7 @@ services:
     ports:
       - "127.0.0.1:3307:3306"
     deploy:
-      resources:
+      resources:3307
         limits:
           cpus: '0.25'
           memory: 128M
@@ -37,6 +37,7 @@ services:
     domainname: webserver
     volumes:
       - ./docker/apache/php/7.4/vhost.conf:/etc/apache2/sites-available/vhost.conf
+      - ./docker/apache/php/7.4/abcis.sf3.conf:/etc/apache2/sites-available/abcis.sf3.conf
       - ./docker/apache/php/7.4/abcis.sf5.conf:/etc/apache2/sites-available/abcis.sf5.conf
       - ./docker/apache/php/7.4/config/timezone.ini:/usr/local/etc/php/conf.d/timezone.ini
       - ./docker/apache/php/7.4/config/browscap.ini:/usr/local/etc/php/conf.d/browscap.ini
