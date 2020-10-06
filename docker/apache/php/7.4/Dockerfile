@@ -61,6 +61,7 @@ RUN docker-php-ext-install pdo_mysql && \
     docker-php-ext-install json && \
     docker-php-ext-install zip && \
     docker-php-ext-install -j$(nproc) intl && \
+    docker-php-ext-install soap && \
     docker-php-ext-install mbstring && \
     docker-php-ext-install gettext && \
     docker-php-ext-install xml && \
@@ -101,9 +102,9 @@ RUN sed -i -e "s/^ *memory_limit.*/memory_limit = -1/g" -e "s/^ *max_execution_t
 
 # YARN -----------------------------------------------------------------------------------------------------------------
 # Install Yarn
-RUN wget -q https://nodejs.org/dist/v12.15.0/node-v12.15.0-linux-x64.tar.xz && \
-  tar -C /usr/local --strip-components 1 -xJf node-v12.15.0-linux-x64.tar.xz && \
-  curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.22.4 && \
+RUN wget -q https://nodejs.org/dist/v12.18.4/node-v12.18.4-linux-x64.tar.xz && \
+  tar -C /usr/local --strip-components 1 -xJf node-v12.18.4-linux-x64.tar.xz && \
+  curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.22.5 && \
   ln -sf $HOME/.yarn/bin/yarn /usr/local/bin/yarn && \
   ln -sf $HOME/.yarn/bin/yarnpkg /usr/local/bin/yarnpkg
 # end YARN -------------------------------------------------------------------------------------------------------------
