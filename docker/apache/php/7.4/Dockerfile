@@ -88,12 +88,14 @@ RUN chmod -R 777 /var/www \
 RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/vhost.conf
 RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/abcis.sf3.conf
 RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/abcis.sf5.conf
+RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/covid.sf5.conf
 
 RUN a2enmod rewrite
 RUN a2enmod headers
 RUN a2ensite vhost.conf
-RUN a2ensite abcis.sf5.conf
 RUN a2ensite abcis.sf3.conf
+RUN a2ensite abcis.sf5.conf
+RUN a2ensite covid.sf5.conf
 
 RUN ln -sf /dev/stdout /var/log/apache2/access.log \
     && ln -sf /dev/stderr /var/log/apache2/error.log2
@@ -102,9 +104,14 @@ RUN sed -i -e "s/^ *memory_limit.*/memory_limit = -1/g" -e "s/^ *max_execution_t
 
 # YARN -----------------------------------------------------------------------------------------------------------------
 # Install Yarn
-RUN wget -q https://nodejs.org/dist/v12.18.4/node-v12.18.4-linux-x64.tar.xz && \
-  tar -C /usr/local --strip-components 1 -xJf node-v12.18.4-linux-x64.tar.xz && \
+RUN wget -q https://nodejs.org/dist/v14.15.0/node-v14.15.0-linux-x64.tar.xz && \
+  tar -C /usr/local --strip-components 1 -xJf node-v14.15.0-linux-x64.tar.xz && \
   curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.22.5 && \
   ln -sf $HOME/.yarn/bin/yarn /usr/local/bin/yarn && \
   ln -sf $HOME/.yarn/bin/yarnpkg /usr/local/bin/yarnpkg
 # end YARN -------------------------------------------------------------------------------------------------------------
+
+# Install Symfony
+RUN wget https://get.symfony.com/cli/installer -O - | bash
+RUN mv /root/.symfony/bin/symfony /usr/local/bin/symfony
+
