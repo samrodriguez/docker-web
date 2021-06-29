@@ -1,6 +1,6 @@
 ###> Php Storm ###
 .idea/
 /.idea/
-/www/
-/www
-
+/database/
+/app/*
+!/app/index.html

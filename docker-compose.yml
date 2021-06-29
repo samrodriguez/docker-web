@@ -1,64 +1,49 @@
 version: '3.8'
-
 services:
-  mariadb:
-    build:
-      context: ./docker/mariadb
-      args:
-        mysql_version: ${MYSQL_VERSION}
-    container_name: ${COMPOSE_PROJECT_NAME}-mariadb
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_520_ci
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-    command: ["--default-authentication-plugin=mysql_native_password"]
-    ports:
-      - "127.0.0.1:3307:3306"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 128M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
+  webserver:
+    build: ./apache
+    container_name: webserver
     restart: always
     networks:
-      - webserver
-  apache:
-    build:
-      context: ./docker/apache/php/7.4
-      args:
-        php_version: ${PHP_VERSION}
-    container_name: ${COMPOSE_PROJECT_NAME}-apache
-    hostname: webserver.sf
-    domainname: webserver
-    volumes:
-      - ./docker/apache/php/7.4/vhost.conf:/etc/apache2/sites-available/vhost.conf
-      - ./docker/apache/php/7.4/abcis.sf3.conf:/etc/apache2/sites-available/abcis.sf3.conf
-      - ./docker/apache/php/7.4/abcis.sf5.conf:/etc/apache2/sites-available/abcis.sf5.conf
-      - ./docker/apache/php/7.4/covid.sf5.conf:/etc/apache2/sites-available/covid.sf5.conf
-      - ./docker/apache/php/7.4/config/timezone.ini:/usr/local/etc/php/conf.d/timezone.ini
-      - ./docker/apache/php/7.4/config/browscap.ini:/usr/local/etc/php/conf.d/browscap.ini
-      - ./www:/var/www/html
+      - frontend
+      - backend
     ports:
-      - "${PHP_PORT}:80"
+      - '8000:80'
+    volumes:
+      - './apache/php/vhost.conf:/etc/apache2/sites-available/vhost.conf'
+      - './apache/php/docker.abcis.conf:/etc/apache2/sites-available/docker.abcis.conf'
+      - './apache/php/timezone.ini:/usr/local/etc/php/conf.d/timezone.ini'
+      - './app:/var/www/html'
     deploy:
       resources:
         limits:
           cpus: '0.25'
-          memory: 256M
+          memory: 1024M
         reservations:
           cpus: '0.25'
-          memory: 256M
-    restart: 'always'
-    links: 
-      - mariadb
-    depends_on: 
-      - mariadb  
+          memory: 1024M
+  db:
+    image: mariadb
+    container_name: mariadb
+    restart: always
     networks:
-      - webserver
+      - backend
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+    ports:
+      - '3307:3306'
+    volumes:
+      - './database:/var/lib/mysql'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+volumes:
+  database: null
 networks:
-  webserver:
+  frontend: null
+  backend: null

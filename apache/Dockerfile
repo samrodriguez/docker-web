@@ -1,6 +1,4 @@
-ARG php_version
-
-FROM php:${php_version}
+FROM php:7.4-apache
 
 # Update
 RUN apt-get -y update --fix-missing && \
@@ -10,7 +8,7 @@ RUN apt-get -y update --fix-missing && \
 
 # Install useful tools and install important libaries
 RUN apt-get -y update && \
-    apt-get -y --no-install-recommends install nano wget \
+    apt-get -y --no-install-recommends install wget \
     dialog \
     libsqlite3-dev \
     libsqlite3-0 && \
@@ -67,7 +65,11 @@ RUN docker-php-ext-install pdo_mysql && \
     docker-php-ext-install xml && \
     docker-php-ext-install exif
 
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
+RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
+    install-php-extensions http
+ 
 # Install and enable xdebug.
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
@@ -86,21 +88,20 @@ RUN chmod -R 777 /var/www \
     && usermod -u 1000 www-data \
     && chsh -s /bin/bash www-data
 RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/vhost.conf
-RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/abcis.sf3.conf
-RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/abcis.sf5.conf
-RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/covid.sf5.conf
+RUN cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/docker.abcis.conf
 
 RUN a2enmod rewrite
 RUN a2enmod headers
 RUN a2ensite vhost.conf
-RUN a2ensite abcis.sf3.conf
-RUN a2ensite abcis.sf5.conf
-RUN a2ensite covid.sf5.conf
+RUN a2ensite docker.abcis.conf
 
 RUN ln -sf /dev/stdout /var/log/apache2/access.log \
     && ln -sf /dev/stderr /var/log/apache2/error.log2
 
+
 RUN sed -i -e "s/^ *memory_limit.*/memory_limit = -1/g" -e "s/^ *max_execution_time.*/max_execution_time = 0/g" /usr/local/etc/php/php.ini
+RUN sed -i -e "s|;browscap|browscap|g" /usr/local/etc/php/php.ini
+RUN sed -i -e "s|extra/browscap.ini|/usr/local/etc/php/extra/browscap.ini|p" /usr/local/etc/php/php.ini
 
 # YARN -----------------------------------------------------------------------------------------------------------------
 # Install Yarn
@@ -115,3 +116,4 @@ RUN wget -q https://nodejs.org/dist/v14.15.0/node-v14.15.0-linux-x64.tar.xz && \
 RUN wget https://get.symfony.com/cli/installer -O - | bash
 RUN mv /root/.symfony/bin/symfony /usr/local/bin/symfony
 
+WORKDIR /var/www/html
