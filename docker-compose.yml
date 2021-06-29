@@ -1,8 +1,8 @@
 version: '3.8'
 services:
-  webserver:
+  server:
     build: ./apache
-    container_name: webserver
+    container_name: server-apache
     restart: always
     networks:
       - frontend
