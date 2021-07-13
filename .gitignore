@@ -2,5 +2,7 @@
 .idea/
 /.idea/
 /database/
-/app/*
-!/app/index.html
+/abcisgit/
+/mariadb/
+.env
+
